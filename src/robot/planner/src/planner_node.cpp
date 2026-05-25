@@ -58,7 +58,6 @@ void PlannerNode::loadParameters()
     this->declare_parameter<std::string>("path_topic", "/path");
 
     this->declare_parameter<double>("goal_tolerance", 0.30);
-    this->declare_parameter<double>("plan_timeout_seconds", 10.0);
 
     this->declare_parameter<double>("obstacle_threshold", 90.0);
     this->declare_parameter<double>("cost_penalty_scale", 25.0);
@@ -69,7 +68,6 @@ void PlannerNode::loadParameters()
     path_topic_ = this->get_parameter("path_topic").as_string();
 
     goal_tolerance_m_ = this->get_parameter("goal_tolerance").as_double();
-    plan_timeout_s_ = this->get_parameter("plan_timeout_seconds").as_double();
 
     obstacle_threshold_ = this->get_parameter("obstacle_threshold").as_double();
     cost_penalty_scale_ = this->get_parameter("cost_penalty_scale").as_double();
@@ -93,16 +91,6 @@ void PlannerNode::mapCallback(
         return;
     }
 
-    const double elapsed =
-        (this->now() - goal_start_time_).seconds();
-
-    if (elapsed > plan_timeout_s_)
-    {
-        RCLCPP_WARN(
-            this->get_logger(),
-            "Map updated, but planning timeout has expired.");
-        return;
-    }
 
     RCLCPP_INFO(
         this->get_logger(),
@@ -138,7 +126,6 @@ void PlannerNode::goalCallback(
 
     current_goal_ = *msg;
     goal_active_ = true;
-    goal_start_time_ = this->now();
 
     RCLCPP_INFO(
         this->get_logger(),
@@ -174,20 +161,6 @@ void PlannerNode::timerCallback()
 
     if (!has_odom_)
     {
-        return;
-    }
-
-    const double elapsed =
-        (this->now() - goal_start_time_).seconds();
-
-    if (elapsed > plan_timeout_s_)
-    {
-        RCLCPP_WARN(
-            this->get_logger(),
-            "Goal timed out after %.2f seconds.",
-            elapsed);
-
-        resetGoalAndStopRobot();
         return;
     }
 

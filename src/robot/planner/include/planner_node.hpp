@@ -41,7 +41,6 @@ private:
   double robot_y_ = 0.0;
   double robot_z_ = 0.0;
 
-  rclcpp::Time goal_start_time_;
 
   std::string map_topic_;
   std::string goal_topic_;
@@ -49,7 +48,6 @@ private:
   std::string path_topic_;
 
   double goal_tolerance_m_ = 0.03;
-  double plan_timeout_s_ = 10.0;
   double obstacle_threshold_ = 90.0;
   double cost_penalty_scale_ = 25.0;
 
